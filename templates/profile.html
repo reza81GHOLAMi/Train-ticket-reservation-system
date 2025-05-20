@@ -1,0 +1,8 @@
+<h2>پروفایل</h2>
+<p>نام: {{ user.first_name }}</p>
+<p>نام خانوادگی: {{ user.last_name }}</p>
+<p>ایمیل: {{ user.email }}</p>
+<p>شماره تلفن: {{ profile.phone_number }}</p>
+<p>نقش: {{ profile.get_role_display }}</p>
+<p>شرکت: {{ profile.company }}</p>
+<a href="{% url 'edit_profile' %}">ویرایش پروفایل</a>
