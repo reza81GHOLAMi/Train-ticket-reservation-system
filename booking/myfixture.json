@@ -1,0 +1,16 @@
+    [
+        {
+            "model": "models.Trip",
+            "pk": 1,
+            "fields": {
+            "train_number":"T100",
+            "company_id": 1,
+            "capacity": 10,
+            "origin": "Tehran",
+            "destination": "Mashhad",
+            departure_time: "timezone.now() + timedelta(days=1)",
+            arrival_time=timezone.now() + timedelta(days=2),
+            "ticket_price":50000
+            }
+        }
+    ]
