@@ -52,7 +52,15 @@ class TripForm(forms.ModelForm):
         if departure and arrival and arrival <= departure:
             raise ValidationError("تاریخ رسیدن باید بعد از تاریخ حرکت باشد.")
 
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = ['phone_number', 'role', 'company']
 
 class SellerCreationForm(forms.Form):
     username = forms.CharField(max_length=150)

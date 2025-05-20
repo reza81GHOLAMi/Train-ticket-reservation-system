@@ -17,6 +17,7 @@ from .forms import PassengerForm
 from django.forms import formset_factory
 from django.contrib import messages
 from django.utils import timezone
+from .forms import UserForm, UserProfileForm
 
 
 
@@ -125,14 +126,12 @@ def my_tickets(request):
     tickets = Ticket.objects.filter(user=request.user)
     return render(request, 'ticket_list.html', {'tickets': tickets, "now": timezone.now()})
 
-
 def seller_tickets(request):
     if not request.user.userprofile.role == 'seller':
         return HttpResponse("شما اجازه دسترسی ندارید")
     company = request.user.userprofile.company
     tickets = Ticket.objects.filter(trip__company=company)
     return render(request, 'ticket_list.html', {'tickets': tickets})
-
 
 def trip_list(request):
     trips = Trip.objects.all()
@@ -254,6 +253,39 @@ def cancel_ticket(request, ticket_id):
         messages.success(request, "بلیت با موفقیت لغو شد.")
 
     return redirect("my_tickets")
+
+@login_required
+def profile_view(request):
+    user = request.user
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    return render(request, 'profile.html', {'user': user, 'profile': profile})
+
+@login_required
+def edit_profile_view(request):
+    user = request.user
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+
+    # فقط ادمین یا خود کاربر بتواند ویرایش کند
+    if profile.role != 'admin' and request.user != profile.user:
+        return HttpResponseForbidden("شما اجازه دسترسی به این صفحه را ندارید.")
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=user)
+        profile_form = UserProfileForm(request.POST, instance=profile)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('profile')
+    else:
+        user_form = UserForm(instance=user)
+        profile_form = UserProfileForm(instance=profile)
+
+    return render(request, 'edit_profile.html', {
+        'user_form': user_form,
+        'profile_form': profile_form
+    })
+
+
 
 
 
