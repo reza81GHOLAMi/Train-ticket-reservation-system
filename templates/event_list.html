@@ -1,0 +1,12 @@
+{% if user.is_authenticated %}
+    سلام {{ user.username }} | <a href="{% url 'signout' %}">خروج</a>
+{% else %}
+    <a href="{% url 'signin' %}">ورود</a> | <a href="{% url 'signup' %}">ثبت‌نام</a>
+{% endif %}
+
+<h1>رویدادها</h1>
+<ul>
+{% for event in events %}
+    <li><a href="{% url 'event_detail' event.id %}">{{ event.title }}</a> - بلیت: {{ event.available_tickets }}</li>
+{% endfor %}
+</ul>

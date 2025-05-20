@@ -1,0 +1,45 @@
+<h2>لیست بلیت‌های رزرو شده</h2>
+<table border="1">
+    <tr>
+        <th>شناسه کاربر رزو کننده</th>
+        <th>کاربر رزو کننده</th>
+        <th>نام</th>
+        <th>کد ملی</th>
+        <th>سفر</th>
+        <th>مبدأ</th>
+        <th>مقصد</th>
+        <th>زمان حرکت</th>
+        <th>زمان رسیدن</th>
+    </tr>
+    {% for ticket in tickets %}
+    <tr>
+        <td>{{ ticket.user.id }}</td>
+        <td>{{ ticket.user.username }}</td>
+        <td>{{ ticket.first_name }} {{ ticket.last_name }}</td>
+        <td>{{ ticket.national_code }}</td>
+        <td>{{ ticket.trip.train_number }}</td>
+        <td>{{ ticket.trip.origin }}</td>
+        <td>{{ ticket.trip.destination }}</td>
+        <td>{{ ticket.trip.departure_time }}</td>
+        <td>{{ ticket.trip.arrival_time }}</td>
+        <td>
+            {% if ticket.is_canceled %}
+          لغو شده
+            {% else %}
+          فعال
+            {% endif %}
+        </td>
+        <td>
+            {% if not ticket.is_canceled and ticket.trip.departure_time > now %}
+                <form action="{% url 'cancel_ticket' ticket.id %}" method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('آیا مطمئن هستید؟')">لغو</button>
+                </form>
+            {% else %}
+                <span style="color: gray;">غیرقابل لغو</span>
+            {% endif %}
+        </td>
+
+    </tr>
+    {% endfor %}
+</table>

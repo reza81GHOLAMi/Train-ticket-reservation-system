@@ -1,0 +1,21 @@
+<h2>رزرو بلیت برای سفر {{ trip.id }}</h2>
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-danger">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="ticket_count" value="{{ ticket_count }}">
+    {{ formset.management_form }}
+
+    {% for form in formset %}
+        <fieldset>
+            <legend>مسافر {{ forloop.counter }}</legend>
+            {{ form.as_p }}
+        </fieldset>
+    {% endfor %}
+
+    <button type="submit">ثبت بلیت‌ها</button>
+</form>

@@ -1,0 +1,38 @@
+<h2>لیست سفرها</h2>
+
+<form method="get">
+    <input type="text" name="origin" placeholder="مبدأ">
+    <input type="text" name="destination" placeholder="مقصد">
+    <input type="date" name="departure_time" placeholder="تاریخ حرکت">
+    <input type="date" name="arrival_time" placeholder="تاریخ رسیدن">
+    <button type="submit">فیلتر</button>
+</form>
+
+<table border="1">
+    <tr>
+        <th>شناسه</th>
+        <th>شماره قطار</th>
+        <th>شرکت</th>
+        <th>مبدأ</th>
+        <th>مقصد</th>
+        <th>زمان حرکت</th>
+        <th>زمان رسیدن</th>
+        <th>ظرفیت</th>
+        <th>قیمت</th>
+        <th>جزئیات</th>
+    </tr>
+    {% for trip in trips %}
+    <tr>
+        <td>{{ trip.id }}</td>
+        <td>{{ trip.train_number }}</td>
+        <td>{{ trip.company.name }}</td>
+        <td>{{ trip.origin }}</td>
+        <td>{{ trip.destination }}</td>
+        <td>{{ trip.departure_time }}</td>
+        <td>{{ trip.arrival_time }}</td>
+        <td>{{ trip.capacity }}</td>
+        <td>{{ trip.ticket_price }}</td>
+        <td><a href="{% url 'trip_detail' trip.id %}">جزئیات</a></td>
+    </tr>
+    {% endfor %}
+</table>

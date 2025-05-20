@@ -1,0 +1,11 @@
+<h1>{{ event.title }}</h1>
+<p>{{ event.description }}</p>
+<p>تاریخ: {{ event.date }}</p>
+<p>بلیت باقی‌مانده: {{ event.available_tickets }}</p>
+
+<h2>رزرو بلیت</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">رزرو</button>
+</form>

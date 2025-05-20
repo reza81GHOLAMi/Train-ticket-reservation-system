@@ -1,0 +1,6 @@
+<h2>افزودن فروشنده جدید</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">ثبت فروشنده</button>
+</form>
