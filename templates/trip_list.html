@@ -17,7 +17,8 @@
         <th>مقصد</th>
         <th>زمان حرکت</th>
         <th>زمان رسیدن</th>
-        <th>ظرفیت</th>
+        <th>ظرفیت کل</th>
+        <th>ظرفیت باقی‌مانده</th>
         <th>قیمت</th>
         <th>جزئیات</th>
     </tr>
@@ -31,8 +32,9 @@
         <td>{{ trip.departure_time }}</td>
         <td>{{ trip.arrival_time }}</td>
         <td>{{ trip.capacity }}</td>
+        <td>{{ trip.remaining_capacity }}</td>
         <td>{{ trip.ticket_price }}</td>
-        <td><a href="{% url 'trip_detail' trip.id %}">جزئیات</a></td>
+        <td><a href="{% url 'trip_detail' trip.id %}">نمایش</a></td>
     </tr>
     {% endfor %}
 </table>

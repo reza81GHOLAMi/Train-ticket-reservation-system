@@ -1,4 +1,5 @@
 <h2>رزرو بلیت برای سفر {{ trip.id }}</h2>
+
 {% if messages %}
   {% for message in messages %}
     <div class="alert alert-danger">{{ message }}</div>
@@ -11,11 +12,27 @@
     {{ formset.management_form }}
 
     {% for form in formset %}
-        <fieldset>
+        <fieldset style="border: 1px solid #ccc; margin-bottom: 15px; padding: 10px;">
             <legend>مسافر {{ forloop.counter }}</legend>
-            {{ form.as_p }}
+            <div>
+                <label>نام:</label>
+                {{ form.first_name }}
+            </div>
+            <div>
+                <label>نام خانوادگی:</label>
+                {{ form.last_name }}
+            </div>
+            <div>
+                <label>کد ملی:</label>
+                {{ form.national_code }}
+            </div>
+            <div>
+                <label>تاریخ تولد:</label>
+                {{ form.birth_date }}
+            </div>
         </fieldset>
     {% endfor %}
 
     <button type="submit">ثبت بلیت‌ها</button>
 </form>
+

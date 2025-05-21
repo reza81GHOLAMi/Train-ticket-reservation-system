@@ -1,0 +1,7 @@
+<h2>ثبت نظر برای سفر: {{ trip.train_number }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">ثبت نظر</button>
+</form>

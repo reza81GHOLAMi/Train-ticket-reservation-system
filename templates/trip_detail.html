@@ -1,5 +1,34 @@
 <h2>سفر: {{ trip.train_number }} از {{ trip.origin }} به {{ trip.destination }}</h2>
 <p>شرکت برگزارکننده: {{ trip.company.name }}</p>
 <p>زمان حرکت: {{ trip.departure_time }} — زمان رسیدن: {{ trip.arrival_time }}</p>
-<p>ظرفیت باقی‌مانده: {{ trip.capacity }}</p>
+<p>قیمت: {{ trip.ticket_price }} تومان</p>
+
+<p><strong>ظرفیت کل:</strong> {{ trip.capacity }}</p>
+<p><strong>ظرفیت باقی‌مانده:</strong> {{ trip.remaining_capacity }}</p>
+
+{% if trip.catering_description %}
+    <h3>پذیرایی:</h3>
+    <p>{{ trip.catering_description }}</p>
+{% endif %}
+
+<hr>
+
+<h3>نظرات کاربران</h3>
+{% for review in trip.reviews.all %}
+  <div style="border:1px solid #ccc; margin-bottom:10px; padding:5px;">
+    <strong>{{ review.user.username }} ({{ review.get_role_display }})</strong><br>
+    <span>امتیاز: {{ review.rating }} از 5</span><br>
+    <p>{{ review.comment }}</p>
+    <small>{{ review.created_at|date:"Y-m-d H:i" }}</small>
+  </div>
+{% empty %}
+  <p>نظری ثبت نشده است.</p>
+{% endfor %}
+
+<a href="{% url 'add_trip_review' trip.id %}">ثبت نظر جدید</a>
+
+{% if user.userprofile.role == 'seller' and trip.company == user.userprofile.company %}
+  <a href="{% url 'seller_edit_trip' trip.id %}">ویرایش اطلاعات سفر</a>
+{% endif %}
+
 
