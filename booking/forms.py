@@ -1,10 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Reservation, Trip, UserProfile, Company, Ticket
+from .models import Reservation, Trip, UserProfile, Company, Ticket, TripReview
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-
 
 class SignUpForm(UserCreationForm):
     email = forms.EmailField()
@@ -68,14 +67,35 @@ class SellerCreationForm(forms.Form):
     phone_number = forms.CharField(max_length=11)
     company = forms.ModelChoiceField(queryset=Company.objects.all())
 
-class TicketForm(forms.ModelForm):
+class TicketReservationForm(forms.ModelForm):
     class Meta:
         model = Ticket
-        fields = ['first_name', 'last_name', 'national_code']
+        fields = ['first_name', 'last_name', 'national_code', 'birth_date']  # ← اضافه شده
+        widgets = {
+            'birth_date': forms.DateInput(attrs={'type': 'date'}),
+        }
 
 class PassengerForm(forms.Form):
     first_name = forms.CharField(max_length=50, label="نام")
     last_name = forms.CharField(max_length=50, label="نام خانوادگی")
     national_code = forms.CharField(max_length=10, label="کد ملی")
+    birth_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+
+class TripReviewForm(forms.ModelForm):
+    class Meta:
+        model = TripReview
+        fields = ['rating', 'comment']
+        widgets = {
+            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
+
+class SellerTripEditForm(forms.ModelForm):
+    class Meta:
+        model = Trip
+        fields = ['ticket_price', 'catering_description', 'discount_percent']
+        widgets = {
+            'discount_percent': forms.NumberInput(attrs={'min': 0, 'max': 100}),
+        }
 
 

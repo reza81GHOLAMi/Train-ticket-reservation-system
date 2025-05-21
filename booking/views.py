@@ -10,14 +10,14 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render, redirect
 from .models import UserProfile, Trip, Ticket
-from .forms import SellerCreationForm, TicketForm
+from .forms import SellerCreationForm
 import time
 from django.core.exceptions import ObjectDoesNotExist
 from .forms import PassengerForm
 from django.forms import formset_factory
 from django.contrib import messages
 from django.utils import timezone
-from .forms import UserForm, UserProfileForm
+from .forms import UserForm, UserProfileForm, TripReviewForm, SellerTripEditForm
 
 
 
@@ -140,6 +140,7 @@ def trip_list(request):
     destination = request.GET.get('destination')
     departure = request.GET.get('departure_time')
     arrival = request.GET.get('arrival_time')
+    i = request.GET.get('arrival_time')
 
     if origin:
         trips = trips.filter(origin__icontains=origin)
@@ -171,7 +172,6 @@ def reserve_ticket_view(request, trip_id):
                 "ticket_count": ticket_count,
             })
 
-        # بررسی تکراری بودن در پایگاه داده
         existing_national_codes = set(
             Ticket.objects.filter(trip=trip).values_list("national_code", flat=True)
         )
@@ -184,13 +184,17 @@ def reserve_ticket_view(request, trip_id):
                 first_name = form.cleaned_data.get("first_name")
                 last_name = form.cleaned_data.get("last_name")
                 national_code = form.cleaned_data.get("national_code")
-
+                birth_date = form.cleaned_data.get("birth_date")
                 if not first_name:
                     form.add_error("first_name", "وارد کردن نام الزامی است.")
                     has_error = True
 
                 if not last_name:
                     form.add_error("last_name", "وارد کردن نام خانوادگی الزامی است.")
+                    has_error = True
+
+                if not birth_date:
+                    form.add_error("birth_date", "وارد کردن تاریخ تولد الزامی است.")
                     has_error = True
 
                 if not national_code:
@@ -225,6 +229,8 @@ def reserve_ticket_view(request, trip_id):
                 first_name=form.cleaned_data["first_name"],
                 last_name=form.cleaned_data["last_name"],
                 national_code=form.cleaned_data["national_code"],
+                birth_date=form.cleaned_data["birth_date"],  # ← جدید
+                applied_discount_percent=trip.discount_percent  # ← جدید
             )
 
         messages.success(request, "رزرو بلیت‌ها با موفقیت انجام شد.")
@@ -284,6 +290,72 @@ def edit_profile_view(request):
         'user_form': user_form,
         'profile_form': profile_form
     })
+
+@login_required
+def cancel_trip_view(request, trip_id):
+    trip = get_object_or_404(Trip, id=trip_id)
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    # بررسی نقش فروشنده
+    if user_profile.role != 'seller':
+        return HttpResponseForbidden("دسترسی فقط برای فروشندگان مجاز است.")
+
+    # بررسی مالکیت شرکت
+    if trip.company != user_profile.company:
+        return HttpResponseForbidden("شما اجازه لغو این سفر را ندارید.")
+
+    # بررسی اینکه هنوز سفر شروع نشده
+    if trip.departure_time <= timezone.now():
+        messages.error(request, "امکان لغو سفر پس از زمان حرکت وجود ندارد.")
+        return redirect('trip_list')  # مسیر مناسب را جایگزین کن
+
+    # کنسل کردن همه بلیت‌ها
+    Ticket.objects.filter(trip=trip).update(is_canceled=True, is_canceled_by_company=True)
+
+    messages.success(request, "سفر با موفقیت لغو شد و بلیت‌های آن نیز کنسل شدند.")
+    return redirect('trip_list')  # مسیر مناسب را جایگزین کن
+
+@login_required
+def add_review_view(request, trip_id):
+    trip = get_object_or_404(Trip, id=trip_id)
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    if request.method == 'POST':
+        form = TripReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.trip = trip
+            review.user = request.user
+            review.role = user_profile.role
+            review.save()
+            messages.success(request, "نظر شما با موفقیت ثبت شد.")
+            return redirect('trip_detail', trip_id=trip.id)  # یا مسیر مناسب
+    else:
+        form = TripReviewForm()
+
+    return render(request, 'add_review.html', {'form': form, 'trip': trip})
+
+@login_required
+def seller_edit_trip_view(request, trip_id):
+    trip = get_object_or_404(Trip, id=trip_id)
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    if user_profile.role != 'seller' or trip.company != user_profile.company:
+        return HttpResponseForbidden("شما اجازه ویرایش این سفر را ندارید.")
+
+    if trip.departure_time <= timezone.now():
+        return HttpResponseForbidden("امکان ویرایش سفر پس از زمان حرکت وجود ندارد.")
+
+    if request.method == 'POST':
+        form = SellerTripEditForm(request.POST, instance=trip)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "اطلاعات سفر با موفقیت ویرایش شد.")
+            return redirect('trip_detail', trip_id=trip.id)
+    else:
+        form = SellerTripEditForm(instance=trip)
+
+    return render(request, 'seller_edit_trip.html', {'form': form, 'trip': trip})
 
 
 

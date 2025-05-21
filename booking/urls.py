@@ -17,5 +17,8 @@ urlpatterns = [
     path("ticket/<int:ticket_id>/cancel/", views.cancel_ticket, name="cancel_ticket"),
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.edit_profile_view, name='edit_profile'),
+    path('trips/<int:trip_id>/cancel/', views.cancel_trip_view, name='cancel_trip'),
+    path('trips/<int:trip_id>/review/', views.add_review_view, name='add_trip_review'),
+    path('trips/<int:trip_id>/edit/', views.seller_edit_trip_view, name='seller_edit_trip'),
 
 ]

@@ -9,9 +9,6 @@ from django.utils import timezone
 from datetime import timedelta
 from django.core.management import call_command
 
-
-
-'''
 class SignupTest(TestCase):
     def test_signup_creates_user_and_profile(self):
         response = self.client.post(reverse('signup'), {
@@ -100,7 +97,6 @@ class TripCreationTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(Trip.objects.count(), 1)
 
-
     def test_customer_cannot_create_trip(self):
         self.client.post(reverse('signin'), {
             'username': 'newuser2',
@@ -154,7 +150,7 @@ class TripCreationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "مبدا و مقصد نمی تواند یکسان باشد.")
         self.assertEqual(Trip.objects.count(), 0)
-'''
+
 class TicketReservationTests(TestCase):
     def setUp(self):
         self.client = Client()
@@ -185,7 +181,7 @@ class TicketReservationTests(TestCase):
             'password1': 'TestPassword123',
             'password2': 'TestPassword123',
         })
-        '''
+        
         self.trip = Trip.objects.create(
             train_number="T100",
             company=self.company,
@@ -196,8 +192,7 @@ class TicketReservationTests(TestCase):
             arrival_time=timezone.now() + timedelta(days=2),
             ticket_price=50000,
         )
-        '''
-        call_command('loaddata', 'myfixture')
+
         self.url = reverse('reserve_ticket', args=[self.trip.id])
         self.client.login(username="tester", password="12345")
 
@@ -208,9 +203,11 @@ class TicketReservationTests(TestCase):
             'form-0-first_name': 'Ali',
             'form-0-last_name': 'Ahmadi',
             'form-0-national_code': '1234567890',
+            'form-0-birth_date': timezone.now() - timedelta(days=10000),
             'form-1-first_name': 'Sara',
             'form-1-last_name': 'Karimi',
             'form-1-national_code': '9876543210',
+            'form-1-birth_date': timezone.now() - timedelta(days=5000),
             'form-TOTAL_FORMS': '2',
             'form-INITIAL_FORMS': '0',
         })
