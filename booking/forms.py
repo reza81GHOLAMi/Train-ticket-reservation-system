@@ -93,9 +93,24 @@ class TripReviewForm(forms.ModelForm):
 class SellerTripEditForm(forms.ModelForm):
     class Meta:
         model = Trip
-        fields = ['ticket_price', 'catering_description', 'discount_percent']
+        fields = ['departure_time', 'arrival_time', 'capacity', 'ticket_price', 'catering_description', 'discount_percent']
         widgets = {
+            'departure_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'arrival_time': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'discount_percent': forms.NumberInput(attrs={'min': 0, 'max': 100}),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        departure_time = cleaned_data.get('departure_time')
+        arrival_time = cleaned_data.get('arrival_time')
+
+        if departure_time and departure_time <= timezone.now():
+            raise ValidationError("تاریخ حرکت باید بعد از تاریخ حال حاضر باشد.")
+        
+        if departure_time and arrival_time and arrival_time <= departure_time:
+            raise ValidationError("تاریخ رسیدن باید بعد از تاریخ حرکت باشد.")
+        
+        return cleaned_data
 
 

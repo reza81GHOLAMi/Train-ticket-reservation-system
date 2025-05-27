@@ -1,8 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ویرایش اطلاعات سفر</title>
+    <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+</head>
+<body>
+  <div class="container">
+    <h2>ویرایش اطلاعات سفر: {{ trip.train_number }}</h2>
 
-<h2>ویرایش اطلاعات سفر: {{ trip.train_number }}</h2>
+  <div class="non-editable-details">
+    <p><strong>مبدا:</strong> {{ trip.origin }}</p>
+    <p><strong>مقصد:</strong> {{ trip.destination }}</p>
+    <p><strong>شرکت:</strong> {{ trip.company.name }}</p>
+  </div>
 
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">ذخیره تغییرات</button>
-</form>
+  <form method="post" class="form-container">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="errorlist">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="form-field-group">
+      <h3>جزئیات زمان‌بندی و ظرفیت</h3>
+      <div class="datetime-group">
+        <div class="form-field">
+          {{ form.departure_time.label_tag }}
+          {{ form.departure_time }}
+          {{ form.departure_time.errors }}
+        </div>
+
+        <div class="form-field">
+          {{ form.arrival_time.label_tag }}
+          {{ form.arrival_time }}
+          {{ form.arrival_time.errors }}
+        </div>
+      </div>
+
+      <div class="form-field">
+        {{ form.capacity.label_tag }}
+        {{ form.capacity }}
+        {{ form.capacity.errors }}
+      </div>
+    </div>
+
+    <div class="form-field-group">
+      <h3>اطلاعات قیمت‌گذاری و پذیرایی</h3>
+      <div class="form-field">
+        {{ form.ticket_price.label_tag }}
+        {{ form.ticket_price }}
+        {{ form.ticket_price.errors }}
+      </div>
+
+      <div class="form-field">
+        {{ form.catering_description.label_tag }}
+        {{ form.catering_description }}
+        {{ form.catering_description.errors }}
+      </div>
+
+      <div class="form-field">
+        {{ form.discount_percent.label_tag }}
+        {{ form.discount_percent }}
+        {{ form.discount_percent.errors }}
+      </div>
+    </div>
+
+    <button type="submit" class="submit-button">ذخیره تغییرات</button>
+  </form>
+</div>
+</body>
+</html>
